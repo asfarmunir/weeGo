@@ -17,7 +17,7 @@ const index = () => {
       >
         <View className=" w-full items-center justify-center h-full p-5">
           <Text className=" text-3xl font-bold">weeGo</Text>
-          <Text className=" text-xl">sharing Ride, saving Miles</Text>
+          <Text className=" text-xl">sharing Rides, saving Miles</Text>
           <TouchableOpacity
             onPress={handlePress}
             className=" bg-blue-600 my-7  items-center justify-center  p-4 w-full rounded-lg"
