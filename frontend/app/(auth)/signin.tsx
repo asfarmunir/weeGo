@@ -1,30 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  ActivityIndicator,
   TouchableOpacity,
   TextInput,
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { useUser } from "@/context/userContext";
+import { Redirect } from "expo-router";
 const Signup: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const [validation, setValidation] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
+
+  const { loading: userLoading, isLoggedIn } = useUser();
+
+  if (!userLoading && isLoggedIn) {
+    return <Redirect href="/home" />;
+  }
 
   const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     let valid = true;
+    setValidation(null);
     let errors = {
       email: "",
       password: "",
@@ -41,14 +55,54 @@ const Signup: React.FC = () => {
 
     setErrors(errors);
 
-    if (valid) {
-      // Handle the signup logic here
-      // Reset form fields
-      setEmail("");
-      setPassword("");
+    // if (valid) {
+    //   setLoading(true);
 
-      // Navigate to the login screen or another screen after successful signup
-      // router.push("/signin");
+    //   axios
+    //     .post("http://192.168.100.23:3000/auth/login", {
+    //       email,
+    //       password,
+    //     })
+    //     .then((res) => {
+    //       console.log(res.data);
+    //       SecureStore.setItemAsync("token", res.data.token);
+    //       let result = SecureStore.getItemAsync("token");
+    //       console.log("🚀 ~ .then ~ result:", result);
+
+    //       setLoading(false);
+    //       // router.push("/home");
+    //     })
+    //     .catch((err) => {
+    //       console.log(err.response.data);
+    //       setValidation(err.response.data.error);
+    //       setLoading(false);
+    //     });
+    // }
+    if (valid) {
+      setLoading(true);
+
+      try {
+        const res = await axios.post("http://192.168.100.23:3000/auth/login", {
+          email,
+          password,
+        });
+
+        console.log(res.data);
+
+        await SecureStore.setItemAsync("token", res.data.token);
+        await SecureStore.setItemAsync("isLoggedIn", "true");
+        router.push("/");
+      } catch (err: any) {
+        if (err.response && err.response.data) {
+          console.log(err.response.data);
+          setValidation(err.response.data.error);
+        } else {
+          console.log(err);
+          setValidation("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -68,8 +122,29 @@ const Signup: React.FC = () => {
             className="bg-slate-100 shadow-sm text-black mt-4 rounded-lg py-5 px-5"
           />
           {errors.email ? (
-            <Text className="text-red-500 mt-1">{errors.email}</Text>
+            <Text className="text-red-500 font-semibold ml-0.5 mt-2">
+              {errors.email}
+            </Text>
           ) : null}
+
+          <View className="flex flex-row items-center shadow-sm rounded-lg pr-3 mt-4 bg-slate-100 justify-between">
+            <TextInput
+              secureTextEntry={!showPassword}
+              onChangeText={setPassword}
+              placeholder={"Password"}
+              placeholderTextColor={"#000000"}
+              value={password}
+              className="  text-black flex-grow  py-5 px-5"
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              {showPassword ? (
+                <Icon name="eye-slash" size={20} color="gray" />
+              ) : (
+                <Icon name="eye" size={20} color="gray" />
+              )}
+            </TouchableOpacity>
+          </View>
+          {/* 
           <TextInput
             secureTextEntry={true}
             onChangeText={setPassword}
@@ -77,16 +152,28 @@ const Signup: React.FC = () => {
             placeholderTextColor={"#000000"}
             value={password}
             className="bg-slate-100 shadow-sm text-black mt-4 rounded-lg py-5 px-5"
-          />
+          /> */}
+
           {errors.password ? (
-            <Text className="text-red-500 mt-1">{errors.password}</Text>
+            <Text className="text-red-500 font-semibold ml-0.5 mt-2">
+              {errors.password}
+            </Text>
           ) : null}
+          {validation && (
+            <Text className="text-red-500 font-semibold ml-0.5 mt-2">
+              {validation}
+            </Text>
+          )}
         </View>
         <TouchableOpacity
           className="bg-blue-600 items-center justify-center p-5 w-full rounded-lg mt-6"
           onPress={handleSignup}
         >
-          <Text className="text-white font-bold">Sign In</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#ffff" />
+          ) : (
+            <Text className="text-white font-bold">Sign In</Text>
+          )}
         </TouchableOpacity>
         <View className="mt-8 flex flex-row items-center justify-center">
           <Text className="text-black">New to weeGo?</Text>

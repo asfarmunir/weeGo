@@ -1,13 +1,34 @@
 import { View, Text, ScrollView } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TouchableOpacity } from "react-native";
-import { Link, router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-const index = () => {
+import { router } from "expo-router";
+import { useUser } from "@/context/userContext";
+import { Redirect } from "expo-router";
+const Index = () => {
+  const { user, loading, isLoggedIn } = useUser();
+  console.log(
+    "elooo",
+
+    user,
+    loading,
+    isLoggedIn
+  );
+
   const handlePress = () => {
-    router.push("/signup");
+    router.push("/signin");
   };
+
+  if (loading) {
+    return (
+      <Text className="text-3xl font-bold mt-36 text-center">Loading...</Text>
+    );
+  }
+
+  if (!loading && isLoggedIn) {
+    return <Redirect href="/home" />;
+  }
+
   return (
     <SafeAreaView className=" ">
       <ScrollView
@@ -15,14 +36,14 @@ const index = () => {
           height: "100%",
         }}
       >
-        <View className=" w-full items-center justify-center h-full p-5">
-          <Text className=" text-3xl font-bold">weeGo</Text>
-          <Text className=" text-xl">sharing Rides, saving Miles</Text>
+        <View className="w-full items-center justify-center h-full p-5">
+          <Text className="text-3xl font-bold">weeGo</Text>
+          <Text className="text-xl">Sharing Rides, Saving Miles</Text>
           <TouchableOpacity
             onPress={handlePress}
-            className=" bg-blue-600 my-7  items-center justify-center  p-4 w-full rounded-lg"
+            className="bg-blue-600 my-7 items-center justify-center p-4 w-full rounded-lg"
           >
-            <Text className=" text-white text-lg font-semibold tracking-wide capitalize">
+            <Text className="text-white text-lg font-semibold tracking-wide capitalize">
               Let's Get Started
             </Text>
           </TouchableOpacity>
@@ -32,4 +53,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
