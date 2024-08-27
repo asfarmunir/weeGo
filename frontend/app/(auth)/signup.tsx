@@ -28,7 +28,12 @@ const Signup: React.FC = () => {
     password: "",
   });
 
-  const { loading: userLoading, isLoggedIn } = useUser();
+  const {
+    loading: userLoading,
+    isLoggedIn,
+    setIsLoggedIn,
+    setUser,
+  } = useUser();
 
   if (!userLoading && isLoggedIn) {
     return <Redirect href="/home" />;
@@ -82,7 +87,9 @@ const Signup: React.FC = () => {
           console.log(response.data.message);
           SecureStore.setItemAsync("isLoggedIn", "true");
           SecureStore.setItemAsync("token", response.data.token);
-          router.push("/signin");
+          setUser(response.data.user);
+          setIsLoggedIn(true);
+          router.push("/home");
         })
         .catch((error) => {
           if (error.response) {

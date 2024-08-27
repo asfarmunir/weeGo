@@ -7,13 +7,7 @@ import { useUser } from "@/context/userContext";
 import { Redirect } from "expo-router";
 const Index = () => {
   const { user, loading, isLoggedIn } = useUser();
-  console.log(
-    "elooo",
-
-    user,
-    loading,
-    isLoggedIn
-  );
+  console.log("user", user, "loading", loading, "isLoggedIn", isLoggedIn);
 
   const handlePress = () => {
     router.push("/signin");

@@ -37,9 +37,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             setIsLoggedIn(false);
           })
           .finally(() => {
+            console.log("finally");
             setLoading(false);
           });
       }
+      setLoading(false);
     };
     fetchData();
   }, []);

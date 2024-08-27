@@ -20,10 +20,12 @@ const registerNewUser = async (req, res) => {
 
     const user = new User(data);
     await user.save();
-
+    const token = jwt.sign({ email: user.email, id: user._id }, JWT_SECRET);
+    
     return res.status(201).json({
       message: 'User created successfully',
-      data: user,
+       user,
+      token
     });
   } catch (error) {
     console.error('Error during user registration:', error);
@@ -47,7 +49,7 @@ const loginUser = async (req, res) => {
         }
 
         const token = jwt.sign({ email: user.email, id: user._id }, JWT_SECRET);
-        return res.status(200).json({ message: 'User logged in successfully', token });
+        return res.status(200).json({ message: 'User logged in successfully', token , user });
         
     } catch (error) {
         console.error('Error during user login:', error);
@@ -60,8 +62,6 @@ const getLoggedInUser = async (req, res) => {
         const { token } = req.body;
 
         const userData = jwt.verify(token, JWT_SECRET);
-        console.log("🚀 ~ getLoggedInUser ~ userData:", userData)
-
         if (!userData) {
             return res.status(401).json({ error: 'Invalid token' });
         }
