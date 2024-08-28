@@ -18,11 +18,9 @@ const Index = () => {
       <Text className="text-3xl font-bold mt-36 text-center">Loading...</Text>
     );
   }
-
   if (!loading && isLoggedIn) {
     return <Redirect href="/home" />;
   }
-
   return (
     <SafeAreaView className=" ">
       <ScrollView

@@ -15,8 +15,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { useUser } from "@/context/userContext";
 import { Redirect } from "expo-router";
 const Signup: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("asfar@gmail.com");
+  const [password, setPassword] = useState<string>("asfarasfar");
   const [loading, setLoading] = useState<boolean>(false);
   const [validation, setValidation] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -125,6 +125,7 @@ const Signup: React.FC = () => {
             keyboardType="email-address"
             placeholder={"Email"}
             placeholderTextColor={"#000000"}
+            defaultValue="asfar@gmail.com"
             value={email}
             className="bg-slate-100 shadow-sm text-black mt-4 rounded-lg py-5 px-5"
           />
@@ -140,6 +141,7 @@ const Signup: React.FC = () => {
               onChangeText={setPassword}
               placeholder={"Password"}
               placeholderTextColor={"#000000"}
+              defaultValue="asfarasfar"
               value={password}
               className="  text-black flex-grow  py-5 px-5"
             />

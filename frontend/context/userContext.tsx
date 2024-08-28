@@ -1,21 +1,45 @@
-import { useContext, createContext, useState, useEffect } from "react";
+import {
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
-const userContext = createContext({
+// Define the User interface
+interface IUser {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+}
+
+interface IUserContext {
+  user: IUser | null;
+  setUser: (user: IUser | null) => void;
+  loading: boolean;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
+  setLoading: (loading: boolean) => void;
+}
+
+const userContext = createContext<IUserContext>({
   user: null,
-  setUser: (user: any) => {},
+  setUser: () => {},
   loading: true,
   isLoggedIn: false,
-  setIsLoggedIn: (isLoggedIn: boolean) => {},
-  setLoading: (loading: boolean) => {},
+  setIsLoggedIn: () => {},
+  setLoading: () => {},
 });
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState(null);
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const getToken = async () => {
+
+  const getToken = async (): Promise<string | null> => {
     const token = await SecureStore.getItemAsync("token");
     return token || null;
   };
@@ -24,25 +48,22 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchData = async () => {
       const token = await getToken();
       if (token) {
-        await axios
-          .post("http://192.168.100.23:3000/auth", {
+        try {
+          const res = await axios.post("http://192.168.100.23:3000/auth", {
             token,
-          })
-          .then((res) => {
-            setUser(res.data);
-            setIsLoggedIn(true);
-          })
-          .catch((err) => {
-            console.log(err.response.data);
-            setIsLoggedIn(false);
-          })
-          .finally(() => {
-            console.log("finally");
-            setLoading(false);
           });
+          setUser(res.data.data);
+          setIsLoggedIn(true);
+        } catch (err) {
+          setIsLoggedIn(false);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     };
+
     fetchData();
   }, []);
 
@@ -62,6 +83,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Custom hook to use the user context
 export const useUser = () => {
   return useContext(userContext);
 };
