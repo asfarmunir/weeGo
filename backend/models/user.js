@@ -1,11 +1,28 @@
-
 const { Schema, model } = require('mongoose');
 
-const userSchema = new Schema({
+const driverProfileSchema = new Schema({
+    licenseNumber: {
+        type: String,
+        required: true,
+    },
+    vehicleType: {
+        type: String,
+        required: true,
+    },
+    vehicleNumber: {
+        type: String,
+        required: true,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+});
 
+const userSchema = new Schema({
     firstname: {
         type: String,
-        required: true
+        required: true,
     },
     lastname: {
         type: String,
@@ -13,20 +30,25 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     phoneNumber: {
         type: String,
     },
-
-   
-    });
+    isDriver: {
+        type: Boolean,
+        default: false,
+    },
+    driverProfile: {
+        type: driverProfileSchema,
+        default: null,
+    },
+});
 
 const User = model('User', userSchema);
 
-module.exports = User;  
-
+module.exports = User;

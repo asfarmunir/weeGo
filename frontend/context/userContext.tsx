@@ -14,6 +14,7 @@ interface IUser {
   lastname: string;
   email: string;
   password: string;
+  isDriver: boolean;
 }
 
 interface IUserContext {
@@ -67,6 +68,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     fetchData();
   }, []);
 
+  console.log("User: ", user);
   return (
     <userContext.Provider
       value={{

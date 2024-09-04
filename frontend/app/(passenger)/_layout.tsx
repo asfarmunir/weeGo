@@ -8,8 +8,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import { useUser } from "@/context/userContext";
+import { Link } from "expo-router";
 
+import { useUser } from "@/context/userContext";
 export function CustomDrawerContent(props: any) {
   const { setUser, setIsLoggedIn, user } = useUser();
   const router = useRouter();
@@ -26,6 +27,9 @@ export function CustomDrawerContent(props: any) {
     } catch (error) {
       console.error("Error logging out: ", error);
     }
+  };
+  const route = () => {
+    router.replace("/driver");
   };
 
   return (
@@ -61,6 +65,23 @@ export function CustomDrawerContent(props: any) {
             marginBottom: bottom,
           }}
         >
+          {user?.isDriver ? (
+            <TouchableOpacity
+              className="bg-blue-500 py-3 px-4 rounded-lg items-center"
+              onPress={route}
+            >
+              <Text className="text-white text-lg font-semibold">
+                Contniue as Driver
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+        <View
+          className="mb-4"
+          style={{
+            marginBottom: bottom,
+          }}
+        >
           <TouchableOpacity
             className="bg-red-500 py-3 px-4 rounded-lg items-center"
             onPress={handleLogout}
@@ -76,11 +97,13 @@ export function CustomDrawerContent(props: any) {
 // Drawer navigator setup
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import HomeScreen from "./home";
+import DriverRegister from "./driverRegistration";
 import NotificationsScreen from "./explore";
 
 const Drawer = createDrawerNavigator();
-
 export default function App() {
+  const { user } = useUser();
+
   return (
     <>
       <Drawer.Navigator
@@ -89,6 +112,15 @@ export default function App() {
       >
         <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Notifications" component={NotificationsScreen} />
+        {!user?.isDriver && (
+          <Drawer.Screen
+            name="DriverRegister"
+            component={DriverRegister}
+            options={{
+              title: "Become a Driver",
+            }}
+          />
+        )}
       </Drawer.Navigator>
       <StatusBar style="dark" />
     </>

@@ -27,10 +27,10 @@ const HomeScreen: React.FC = () => {
       >
         <Ionicons name="menu" size={28} color="black" />
       </TouchableOpacity>
-      <Text className="text-2xl bg-sky-600">Home Screen</Text>
-      <Link href="/signup" className="text-blue-600">
-        Go to Sign I
-      </Link>
+      <Text className="text-4xl text-blue-600 font-bold ">Driver Side</Text>
+      <Text className="text-blue-600 mt-4">
+        switch to Passenger side from the drawer
+      </Text>
       <StatusBar style="auto" />
     </View>
   );
