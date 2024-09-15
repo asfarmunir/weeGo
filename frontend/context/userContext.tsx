@@ -15,6 +15,7 @@ interface IUser {
   email: string;
   password: string;
   isDriver: boolean;
+  currentProfileStatus: string;
 }
 
 interface IUserContext {
@@ -37,6 +38,7 @@ const userContext = createContext<IUserContext>({
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<IUser | null>(null);
+  console.log("🚀 ~ UserProvider ~ user:", user);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -68,7 +70,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     fetchData();
   }, []);
 
-  console.log("User: ", user);
   return (
     <userContext.Provider
       value={{

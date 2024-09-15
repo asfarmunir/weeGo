@@ -124,10 +124,37 @@ const updateDriverProfile = async (req, res) => {
   }
 };
 
+const updateCurrentStatusofUser = async (req, res) => {
+  try {
+    const { token, updatedStatus } = req.body;
+    console.log("🚀 ~ updateCurrentStatusofUser ~ status:", updatedStatus)
+
+    const userData = jwt.verify(token, JWT_SECRET);
+    if (!userData) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const user = await User.findById(userData.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    user.currentProfileStatus = updatedStatus;
+
+    await user.save();
+
+    return res.status(200).json({ message: 'User status updated successfully', user: user });
+
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    return res.status(400).json({ error: error.message });
+  }
+}
+
 module.exports = {
   registerNewUser,
   loginUser,
   getLoggedInUser,
   addDriverProfile,
   updateDriverProfile,
+  updateCurrentStatusofUser,
 };

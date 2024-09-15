@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { Link } from "expo-router";
+import axios from "axios";
 
 import { useUser } from "@/context/userContext";
 export function CustomDrawerContent(props: any) {
@@ -28,7 +29,30 @@ export function CustomDrawerContent(props: any) {
       console.error("Error logging out: ", error);
     }
   };
-  const route = () => {
+  const route = async () => {
+    const updatedStatus = "passenger";
+    const token = await SecureStore.getItemAsync("token");
+    axios
+      .post("http://192.168.100.23:3000/auth/updateCurrentStatus", {
+        token,
+        updatedStatus,
+      })
+      .then((response) => {
+        setUser(response.data.user);
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log("Error:", error.response.data.error);
+          alert(error.response.data.error);
+        } else if (error.request) {
+          console.log("Request Error:", error.request);
+          alert("No response from server. Please try again later.");
+        } else {
+          console.log("General Error:", error.message);
+          alert("An unexpected error occurred.");
+        }
+      });
+
     router.replace("/");
   };
 

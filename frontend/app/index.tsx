@@ -19,6 +19,9 @@ const Index = () => {
     );
   }
   if (!loading && isLoggedIn) {
+    if (user?.currentProfileStatus === "driver") {
+      return <Redirect href="/driver" />;
+    }
     return <Redirect href="/home" />;
   }
   return (

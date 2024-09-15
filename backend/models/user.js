@@ -39,6 +39,10 @@ const userSchema = new Schema({
     phoneNumber: {
         type: String,
     },
+    currentProfileStatus:{
+            type:String,
+            enum:['driver','passenger'],
+        },
     isDriver: {
         type: Boolean,
         default: false,
