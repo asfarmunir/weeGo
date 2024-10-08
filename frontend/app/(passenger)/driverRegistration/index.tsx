@@ -79,7 +79,7 @@ const Signup: React.FC = () => {
         vehicleNumber,
       };
       axios
-        .post("http://192.168.100.23:3000/auth/addDriverProfile", {
+        .post("http://192.168.100.25:3000/auth/addDriverProfile", {
           token,
           data,
         })
@@ -156,7 +156,7 @@ const Signup: React.FC = () => {
           ) : null}
         </View>
         <TouchableOpacity
-          className="bg-blue-600 items-center justify-center p-5 w-full rounded-lg mt-6"
+          className="bg-yellow-500 items-center justify-center p-5 w-full rounded-lg mt-6"
           onPress={handleSubmit}
         >
           {loading ? (
@@ -168,7 +168,7 @@ const Signup: React.FC = () => {
         <View className="mt-8 flex flex-row items-center justify-center">
           <Text className="text-black">Wanna think again?</Text>
           <TouchableOpacity onPress={() => router.push("/")}>
-            <Text className="font-extrabold text-blue-600 ml-1">Go Back</Text>
+            <Text className="font-extrabold text-yellow-600 ml-1">Go Back</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

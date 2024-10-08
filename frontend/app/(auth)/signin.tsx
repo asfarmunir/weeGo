@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Switch,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -14,12 +15,14 @@ import * as SecureStore from "expo-secure-store";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useUser } from "@/context/userContext";
 import { Redirect } from "expo-router";
-const Signup: React.FC = () => {
-  const [email, setEmail] = useState<string>("asfar@gmail.com");
-  const [password, setPassword] = useState<string>("asfarasfar");
+
+const Signin: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [validation, setValidation] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -41,7 +44,7 @@ const Signup: React.FC = () => {
     return re.test(email);
   };
 
-  const handleSignup = async () => {
+  const handleSignin = async () => {
     let valid = true;
     setValidation(null);
     let errors = {
@@ -60,39 +63,14 @@ const Signup: React.FC = () => {
 
     setErrors(errors);
 
-    // if (valid) {
-    //   setLoading(true);
-
-    //   axios
-    //     .post("http://192.168.100.23:3000/auth/login", {
-    //       email,
-    //       password,
-    //     })
-    //     .then((res) => {
-    //       console.log(res.data);
-    //       SecureStore.setItemAsync("token", res.data.token);
-    //       let result = SecureStore.getItemAsync("token");
-    //       console.log("🚀 ~ .then ~ result:", result);
-
-    //       setLoading(false);
-    //       // router.push("/home");
-    //     })
-    //     .catch((err) => {
-    //       console.log(err.response.data);
-    //       setValidation(err.response.data.error);
-    //       setLoading(false);
-    //     });
-    // }
     if (valid) {
       setLoading(true);
 
       try {
-        const res = await axios.post("http://192.168.100.23:3000/auth/login", {
+        const res = await axios.post("http://192.168.100.25:3000/auth/login", {
           email,
           password,
         });
-
-        console.log(res.data);
 
         await SecureStore.setItemAsync("token", res.data.token);
         await SecureStore.setItemAsync("isLoggedIn", "true");
@@ -101,10 +79,8 @@ const Signup: React.FC = () => {
         router.push("/");
       } catch (err: any) {
         if (err.response && err.response.data) {
-          console.log(err.response.data);
           setValidation(err.response.data.error);
         } else {
-          console.log(err);
           setValidation("An unexpected error occurred. Please try again.");
         }
       } finally {
@@ -116,34 +92,46 @@ const Signup: React.FC = () => {
   return (
     <SafeAreaView className="bg-white h-full px-4">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="mt-12">
-          <Text className="text-4xl font-bold pb-3 w-full">Sign In</Text>
+        {/* Back Button */}
+        <TouchableOpacity onPress={() => router.back()} className="mt-4 ml-2">
+          <Icon name="arrow-left" size={24} color="black" />
+        </TouchableOpacity>
+
+        {/* Title */}
+        <View className="mt-4">
+          <Text className="text-3xl font-bold">Login to your</Text>
+          <Text className="text-3xl font-bold">Account</Text>
         </View>
-        <View className="mt-5">
-          <TextInput
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            placeholder={"Email"}
-            placeholderTextColor={"#000000"}
-            defaultValue="asfar@gmail.com"
-            value={email}
-            className="bg-slate-100 shadow-sm text-black mt-4 rounded-lg py-5 px-5"
-          />
+
+        {/* Email Input */}
+        <View className="mt-8">
+          <View className="flex flex-row items-center bg-gray-100 rounded-lg px-4 py-4 mt-4">
+            <Icon name="envelope" size={20} color="gray" />
+            <TextInput
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              placeholder="Email"
+              placeholderTextColor="#999"
+              value={email}
+              className="ml-3 text-black flex-grow"
+            />
+          </View>
           {errors.email ? (
             <Text className="text-red-500 font-semibold ml-0.5 mt-2">
               {errors.email}
             </Text>
           ) : null}
 
-          <View className="flex flex-row items-center shadow-sm rounded-lg pr-3 mt-4 bg-slate-100 justify-between">
+          {/* Password Input */}
+          <View className="flex flex-row items-center bg-gray-100 rounded-lg px-4 py-4 mt-4 justify-between">
+            <Icon name="lock" size={20} color="gray" />
             <TextInput
               secureTextEntry={!showPassword}
               onChangeText={setPassword}
-              placeholder={"Password"}
-              placeholderTextColor={"#000000"}
-              defaultValue="asfarasfar"
+              placeholder="Password"
+              placeholderTextColor="#999"
               value={password}
-              className="  text-black flex-grow  py-5 px-5"
+              className="ml-3 text-black flex-grow"
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               {showPassword ? (
@@ -153,41 +141,63 @@ const Signup: React.FC = () => {
               )}
             </TouchableOpacity>
           </View>
-          {/* 
-          <TextInput
-            secureTextEntry={true}
-            onChangeText={setPassword}
-            placeholder={"Password"}
-            placeholderTextColor={"#000000"}
-            value={password}
-            className="bg-slate-100 shadow-sm text-black mt-4 rounded-lg py-5 px-5"
-          /> */}
-
           {errors.password ? (
             <Text className="text-red-500 font-semibold ml-0.5 mt-2">
               {errors.password}
             </Text>
           ) : null}
-          {validation && (
-            <Text className="text-red-500 font-semibold ml-0.5 mt-2">
-              {validation}
-            </Text>
-          )}
         </View>
+
+        {/* Remember Me Switch */}
+        <View className="flex flex-row items-center mt-6">
+          <Switch value={rememberMe} onValueChange={setRememberMe} />
+          <Text className="ml-3 text-black">Remember me</Text>
+        </View>
+
+        {/* Sign In Button */}
         <TouchableOpacity
-          className="bg-blue-600 items-center justify-center p-5 w-full rounded-lg mt-6"
-          onPress={handleSignup}
+          className="bg-yellow-500 items-center justify-center p-4 w-full rounded-lg mt-6"
+          onPress={handleSignin}
         >
           {loading ? (
-            <ActivityIndicator size="small" color="#ffff" />
+            <ActivityIndicator size="small" color="#ffffff" />
           ) : (
-            <Text className="text-white font-bold">Sign In</Text>
+            <Text className="text-white font-bold">Sign in</Text>
           )}
         </TouchableOpacity>
-        <View className="mt-8 flex flex-row items-center justify-center">
-          <Text className="text-black">New to weeGo?</Text>
+
+        {/* Forgot Password Link */}
+        {/* <View className="mt-4 items-center">
+          <TouchableOpacity onPress={}>
+            <Text className="text-yellow-500 font-semibold">Forgot the password?</Text>
+          </TouchableOpacity>
+        </View> */}
+
+        {/* Or Continue with */}
+        <View className="flex-row items-center justify-center mt-8">
+          <View className="flex-grow h-px bg-gray-300" />
+          <Text className="mx-4 text-gray-500">or continue with</Text>
+          <View className="flex-grow h-px bg-gray-300" />
+        </View>
+
+        {/* Social Media Login Buttons */}
+        <View className="flex-row justify-around mt-6">
+          <TouchableOpacity className="bg-blue-600 p-4 rounded-full">
+            <Icon name="facebook" size={24} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity className="bg-gray-100 p-4 rounded-full border border-gray-300">
+            <Icon name="google" size={24} color="#DB4437" />
+          </TouchableOpacity>
+          <TouchableOpacity className="bg-gray-100 p-4 rounded-full border border-gray-300">
+            <Icon name="apple" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Signup Link */}
+        <View className="mt-8 flex-row justify-center">
+          <Text className="text-gray-500">Don't have an account?</Text>
           <TouchableOpacity onPress={() => router.push("/signup")}>
-            <Text className="font-extrabold text-blue-600 ml-1">Sign Up</Text>
+            <Text className="text-yellow-500 font-semibold ml-1">Sign up</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -195,4 +205,4 @@ const Signup: React.FC = () => {
   );
 };
 
-export default Signup;
+export default Signin;

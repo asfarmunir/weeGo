@@ -31,7 +31,7 @@ export function CustomDrawerContent(props: any) {
     const updatedStatus = "driver";
     const token = await SecureStore.getItemAsync("token");
     axios
-      .post("http://192.168.100.23:3000/auth/updateCurrentStatus", {
+      .post("http://192.168.100.25:3000/auth/updateCurrentStatus", {
         token,
         updatedStatus,
       })
@@ -89,7 +89,7 @@ export function CustomDrawerContent(props: any) {
         >
           {user?.isDriver ? (
             <TouchableOpacity
-              className="bg-blue-500 py-3 px-4 rounded-lg items-center"
+              className="bg-yellow-500 py-3 px-4 rounded-full items-center mb-4"
               onPress={route}
             >
               <Text className="text-white text-lg font-semibold">
@@ -105,7 +105,7 @@ export function CustomDrawerContent(props: any) {
           }}
         >
           <TouchableOpacity
-            className="bg-red-500 py-3 px-4 rounded-lg items-center"
+            className="bg-yellow-500 py-3 px-4 rounded-full items-center mb-2"
             onPress={handleLogout}
           >
             <Text className="text-white text-lg font-semibold">Logout</Text>

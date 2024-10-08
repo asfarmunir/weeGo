@@ -2,6 +2,9 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'weyoungins';
+const express = require('express');
+const router = express.Router();
+const User = require('../models/User');
 
 const registerNewUser = async (req, res) => {
   try {
@@ -150,6 +153,56 @@ const updateCurrentStatusofUser = async (req, res) => {
   }
 }
 
+
+// Find Nearest Driver API
+
+const findNearestDriver = async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;  // Passenger's location
+
+    // Ensure latitude and longitude are provided
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: 'Latitude and longitude are required' });
+    }
+
+    // Find the nearest available and verified driver within 1km (1000 meters)
+    const nearestDriver = await User.findOne({
+      isDriver: true,  // Only drivers
+      'driverProfile.isVerified': true,  // Only verified drivers
+      'driverProfile.location': {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [longitude, latitude],  // Passenger's coordinates
+          },
+          $maxDistance: 1000  // 1km radius (1000 meters)
+        }
+      }
+    });
+
+    // If no drivers found
+    if (!nearestDriver) {
+      return res.status(404).json({ error: 'No drivers available nearby' });
+    }
+
+    // Respond with the nearest driver details
+    return res.status(200).json({
+      success: true,
+      driver: {
+        name: nearestDriver.firstname,
+        vehicleType: nearestDriver.driverProfile.vehicleType,
+        vehicleNumber: nearestDriver.driverProfile.vehicleNumber,
+        location: nearestDriver.driverProfile.location.coordinates,
+      }
+    });
+  } catch (error) {
+    console.error('Error finding nearest driver:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
 module.exports = {
   registerNewUser,
   loginUser,
@@ -157,4 +210,5 @@ module.exports = {
   addDriverProfile,
   updateDriverProfile,
   updateCurrentStatusofUser,
+  findNearestDriver,
 };

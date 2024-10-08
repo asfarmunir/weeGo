@@ -1,10 +1,23 @@
-
 const router = require('express').Router();
 
-const { registerNewUser, loginUser, getLoggedInUser, addDriverProfile, updateCurrentStatusofUser } = require('../controllers/user');
+// Import your controller functions
+const {
+  registerNewUser,
+  loginUser,
+  getLoggedInUser,
+  addDriverProfile,
+  updateCurrentStatusofUser,
+} = require('../controllers/user');
 
-router.post('/register', registerNewUser).post('/login', loginUser).post('/', getLoggedInUser).post('/addDriverProfile', addDriverProfile).post('/updateCurrentStatus', updateCurrentStatusofUser);
+// Import the findNearestDriver function
+const { findNearestDriver } = require('../controllers/driver');
+
+// Define the routes
+router.post('/register', registerNewUser)
+  .post('/login', loginUser)
+  .post('/', getLoggedInUser)
+  .post('/addDriverProfile', addDriverProfile)
+  .post('/updateCurrentStatus', updateCurrentStatusofUser)
+  .post('/drivers/nearest', findNearestDriver);  // Added nearest driver route
 
 module.exports = router;
-
-
